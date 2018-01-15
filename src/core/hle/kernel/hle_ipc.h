@@ -151,13 +151,13 @@ public:
         return domain != nullptr;
     }
 
-    template<typename T>
+    template <typename T>
     SharedPtr<T> GetCopyObject(size_t index) {
         ASSERT(index < copy_objects.size());
         return DynamicObjectCast<T>(copy_objects[index]);
     }
 
-    template<typename T>
+    template <typename T>
     SharedPtr<T> GetMoveObject(size_t index) {
         ASSERT(index < move_objects.size());
         return DynamicObjectCast<T>(move_objects[index]);
@@ -173,6 +173,14 @@ public:
 
     void AddDomainObject(std::shared_ptr<SessionRequestHandler> object) {
         domain_objects.emplace_back(std::move(object));
+    }
+
+    /// Clears the list of objects so that no lingering objects are written accidentally to the
+    /// response buffer.
+    void ClearIncomingObjects() {
+        move_objects.clear();
+        copy_objects.clear();
+        domain_objects.clear();
     }
 
 private:

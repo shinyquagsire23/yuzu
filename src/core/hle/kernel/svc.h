@@ -24,6 +24,10 @@ struct PageInfo {
 enum class GetInfoType : u64 {
     // 1.0.0+
     AllowedCpuIdBitmask = 0,
+    MapRegionBaseAddr = 2,
+    MapRegionSize = 3,
+    HeapRegionBaseAddr = 4,
+    HeapRegionSize = 5,
     TotalMemoryUsage = 6,
     TotalHeapUsage = 7,
     RandomEntropy = 11,
@@ -32,6 +36,10 @@ enum class GetInfoType : u64 {
     AddressSpaceSize = 13,
     NewMapRegionBaseAddr = 14,
     NewMapRegionSize = 15,
+    // 3.0.0+
+    TitleId = 18,
+    // 4.0.0+
+    PrivilegedProcessId = 19
 };
 
 void CallSVC(u32 immediate);

@@ -52,7 +52,68 @@ public:
 
 class ISelfController final : public ServiceFramework<ISelfController> {
 public:
-    ISelfController() : ServiceFramework("ISelfController") {}
+    ISelfController() : ServiceFramework("ISelfController") {
+        static const FunctionInfo functions[] = {
+            {11, &ISelfController::SetOperationModeChangedNotification,
+             "SetOperationModeChangedNotification"},
+            {12, &ISelfController::SetPerformanceModeChangedNotification,
+             "SetPerformanceModeChangedNotification"},
+            {13, &ISelfController::SetFocusHandlingMode, "SetFocusHandlingMode"},
+            {16, &ISelfController::SetOutOfFocusSuspendingEnabled,
+             "SetOutOfFocusSuspendingEnabled"},
+        };
+        RegisterHandlers(functions);
+    }
+
+private:
+    void SetOperationModeChangedNotification(Kernel::HLERequestContext& ctx) {
+        IPC::RequestParser rp{ctx};
+
+        bool flag = rp.Pop<bool>();
+
+        IPC::RequestBuilder rb{ctx, 2};
+        rb.Push(RESULT_SUCCESS);
+
+        LOG_WARNING(Service, "(STUBBED) called flag=%u", static_cast<u32>(flag));
+    }
+
+    void SetPerformanceModeChangedNotification(Kernel::HLERequestContext& ctx) {
+        IPC::RequestParser rp{ctx};
+
+        bool flag = rp.Pop<bool>();
+
+        IPC::RequestBuilder rb{ctx, 2};
+        rb.Push(RESULT_SUCCESS);
+
+        LOG_WARNING(Service, "(STUBBED) called flag=%u", static_cast<u32>(flag));
+    }
+
+    void SetFocusHandlingMode(Kernel::HLERequestContext& ctx) {
+        IPC::RequestParser rp{ctx};
+
+        struct FocusHandlingModeParams {
+            u8 unknown0;
+            u8 unknown1;
+            u8 unknown2;
+        };
+        auto flags = rp.PopRaw<FocusHandlingModeParams>();
+
+        IPC::RequestBuilder rb{ctx, 2};
+        rb.Push(RESULT_SUCCESS);
+
+        LOG_WARNING(Service, "(STUBBED) called");
+    }
+
+    void SetOutOfFocusSuspendingEnabled(Kernel::HLERequestContext& ctx) {
+        IPC::RequestParser rp{ctx};
+
+        bool enabled = rp.Pop<bool>();
+
+        IPC::RequestBuilder rb{ctx, 2};
+        rb.Push(RESULT_SUCCESS);
+
+        LOG_WARNING(Service, "(STUBBED) called enabled=%u", static_cast<u32>(enabled));
+    }
 };
 
 class ICommonStateGetter final : public ServiceFramework<ICommonStateGetter> {
@@ -61,6 +122,9 @@ public:
         static const FunctionInfo functions[] = {
             {0, &ICommonStateGetter::GetEventHandle, "GetEventHandle"},
             {1, &ICommonStateGetter::ReceiveMessage, "ReceiveMessage"},
+            {5, &ICommonStateGetter::GetOperationMode, "GetOperationMode"},
+            {6, &ICommonStateGetter::GetPerformanceMode, "GetPerformanceMode"},
+            {9, &ICommonStateGetter::GetCurrentFocusState, "GetCurrentFocusState"},
         };
         RegisterHandlers(functions);
 
@@ -68,6 +132,15 @@ public:
     }
 
 private:
+    enum class FocusState : u8 {
+        InFocus = 1,
+    };
+
+    enum class OperationMode : u8 {
+        Handheld = 0,
+        Docked = 1,
+    };
+
     void GetEventHandle(Kernel::HLERequestContext& ctx) {
         event->Signal();
 
@@ -86,12 +159,50 @@ private:
         LOG_WARNING(Service, "(STUBBED) called");
     }
 
+    void GetOperationMode(Kernel::HLERequestContext& ctx) {
+        IPC::RequestBuilder rb{ctx, 3};
+        rb.Push(RESULT_SUCCESS);
+        rb.Push(static_cast<u8>(OperationMode::Handheld));
+
+        LOG_WARNING(Service, "(STUBBED) called");
+    }
+
+    void GetPerformanceMode(Kernel::HLERequestContext& ctx) {
+        IPC::RequestBuilder rb{ctx, 3};
+        rb.Push(RESULT_SUCCESS);
+        rb.Push<u32>(0);
+
+        LOG_WARNING(Service, "(STUBBED) called");
+    }
+
+    void GetCurrentFocusState(Kernel::HLERequestContext& ctx) {
+        IPC::RequestBuilder rb{ctx, 3};
+        rb.Push(RESULT_SUCCESS);
+        rb.Push(static_cast<u8>(FocusState::InFocus));
+
+        LOG_WARNING(Service, "(STUBBED) called");
+    }
+
     Kernel::SharedPtr<Kernel::Event> event;
 };
 
 class IApplicationFunctions final : public ServiceFramework<IApplicationFunctions> {
 public:
-    IApplicationFunctions() : ServiceFramework("IApplicationFunctions") {}
+    IApplicationFunctions() : ServiceFramework("IApplicationFunctions") {
+        static const FunctionInfo functions[] = {
+            {40, &IApplicationFunctions::NotifyRunning, "NotifyRunning"},
+        };
+        RegisterHandlers(functions);
+    }
+
+private:
+    void NotifyRunning(Kernel::HLERequestContext& ctx) {
+        IPC::RequestBuilder rb{ctx, 3};
+        rb.Push(RESULT_SUCCESS);
+        rb.Push<u8>(0); // Unknown, seems to be ignored by official processes
+
+        LOG_WARNING(Service, "(STUBBED) called");
+    }
 };
 
 class ILibraryAppletCreator final : public ServiceFramework<ILibraryAppletCreator> {

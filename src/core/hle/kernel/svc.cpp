@@ -305,13 +305,25 @@ static ResultCode GetInfo(u64* result, u64 info_id, u64 handle, u64 info_sub_id)
     LOG_TRACE(Kernel_SVC, "called info_id=0x%X, info_sub_id=0x%X, handle=0x%08X", info_id,
               info_sub_id, handle);
 
-    ASSERT(handle == 0 || handle == CurrentProcess);
-
     auto& vm_manager = g_current_process->vm_manager;
 
     switch (static_cast<GetInfoType>(info_id)) {
     case GetInfoType::AllowedCpuIdBitmask:
         *result = g_current_process->allowed_processor_mask;
+        break;
+    case GetInfoType::MapRegionBaseAddr:
+    case GetInfoType::NewMapRegionBaseAddr:
+        *result = vm_manager.GetNewMapRegionBaseAddr();
+        break;
+    case GetInfoType::MapRegionSize:
+    case GetInfoType::NewMapRegionSize:
+        *result = vm_manager.GetNewMapRegionSize();
+        break;
+    case GetInfoType::HeapRegionBaseAddr:
+        *result = vm_manager.GetNewMapRegionBaseAddr() + vm_manager.GetNewMapRegionSize();
+        break;
+    case GetInfoType::HeapRegionSize:
+        *result = Memory::HEAP_SIZE;
         break;
     case GetInfoType::TotalMemoryUsage:
         *result = vm_manager.GetTotalMemoryUsage();
@@ -328,11 +340,14 @@ static ResultCode GetInfo(u64* result, u64 info_id, u64 handle, u64 info_sub_id)
     case GetInfoType::AddressSpaceSize:
         *result = vm_manager.GetAddressSpaceSize();
         break;
-    case GetInfoType::NewMapRegionBaseAddr:
-        *result = vm_manager.GetNewMapRegionBaseAddr();
+    case GetInfoType::TitleId:
+        LOG_WARNING(Kernel_SVC, "(STUBBED) Attempted to query titleid, returned 0");
+        *result = 0;
         break;
-    case GetInfoType::NewMapRegionSize:
-        *result = vm_manager.GetNewMapRegionSize();
+    case GetInfoType::PrivilegedProcessId:
+        LOG_WARNING(Kernel_SVC,
+                    "(STUBBED) Attempted to query priviledged process id bounds, returned 0");
+        *result = 0;
         break;
     default:
         UNIMPLEMENTED();

@@ -47,6 +47,7 @@ set(SRCS
             hle/service/lm/lm.cpp
             hle/service/nvdrv/devices/nvdisp_disp0.cpp
             hle/service/nvdrv/devices/nvhost_as_gpu.cpp
+            hle/service/nvdrv/devices/nvhost_ctrl_gpu.cpp
             hle/service/nvdrv/devices/nvmap.cpp
             hle/service/nvdrv/interface.cpp
             hle/service/nvdrv/nvdrv.cpp
